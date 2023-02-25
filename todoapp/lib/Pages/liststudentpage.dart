@@ -1,6 +1,5 @@
-import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -17,8 +16,17 @@ class ListStudent extends StatefulWidget {
 class _ListStudentState extends State<ListStudent> {
   final Stream<QuerySnapshot> StudentsStream =
       FirebaseFirestore.instance.collection('students').snapshots();
-  deleteUser(id) {
-    print("User Deleted $id");
+
+  CollectionReference students =
+      FirebaseFirestore.instance.collection('students');
+
+  Future<void> deleteUser(id) {
+    // print("User Deleted $id");
+    return students
+        .doc(id)
+        .delete()
+        .then((value) => ('User Deleted'))
+        .catchError((error) => print('Failed to Delete user: $error'));
   }
 
   @override
@@ -38,6 +46,7 @@ class _ListStudentState extends State<ListStudent> {
           snapshot.data!.docs.map((DocumentSnapshot document) {
             Map a = document.data() as Map<String, dynamic>;
             storedocs.add(a);
+            a['id'] = document.id;
           }).toList();
 
           return Container(
@@ -100,7 +109,7 @@ class _ListStudentState extends State<ListStudent> {
                       ),
                     ],
                   ),
-                  for (var i = 0; i < storedocs.length;i++) ...[
+                  for (var i = 0; i < storedocs.length; i++) ...[
                     TableRow(
                       //Second child is Email
                       children: [
@@ -129,7 +138,9 @@ class _ListStudentState extends State<ListStudent> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => UpdateStudentPage(),
+                                      builder: (context) => UpdateStudentPage(
+                                        id: storedocs[i]['id']
+                                      ),
                                     ),
                                   ),
                                 },
@@ -140,7 +151,7 @@ class _ListStudentState extends State<ListStudent> {
                               ),
                               IconButton(
                                 onPressed: () => {
-                                  deleteUser(1),
+                                  deleteUser(storedocs[i]['id']),
                                 },
                                 icon: Icon(
                                   Icons.delete,

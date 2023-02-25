@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -33,9 +34,17 @@ class _AddStudentPageState extends State<AddStudentPage> {
     emailController.clear();
     passwordController.clear();
   }
+//Adding student
 
-  addUser() {
-    print("user added");
+  CollectionReference students =
+      FirebaseFirestore.instance.collection('students');
+
+  Future<void> addUser() {
+    // print("user added");
+    return students
+        .add({'name': name, 'email': email, 'password': password})
+        .then((value) => print('user Added'))
+        .catchError((error) => print('Failed to Add user: $error'));
   }
 
   @override
@@ -134,8 +143,10 @@ class _AddStudentPageState extends State<AddStudentPage> {
                       onPressed: () {
                         clearText();
                       },
-                      child: Text('Reset',
-                      style: TextStyle(fontSize: 18.0),),
+                      child: Text(
+                        'Reset',
+                        style: TextStyle(fontSize: 18.0),
+                      ),
                       style: ElevatedButton.styleFrom(primary: Colors.blueGrey),
                     ),
                   ],
