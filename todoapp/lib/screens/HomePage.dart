@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todoapp/constants/colors.dart';
+import 'package:todoapp/model/sqlhelper.dart';
 import 'package:todoapp/widgets/todo_item.dart';
 
 import '../model/todo.dart';
@@ -14,7 +15,14 @@ class HomPage extends StatefulWidget {
 class _HomPageState extends State<HomPage> {
   final todoList = ToDo.todoList();
   final _todoController = TextEditingController();
-  List<ToDo> _foundToDo = [];
+  List<Map<String, dynamic>> _foundToDo = [];
+
+  void _refreshTodo() async {
+    final data = await SQLHelper.getItems();
+    setState(() {
+      _foundToDo = data;
+    });
+  }
 
   @override
   void initState() {
@@ -48,12 +56,12 @@ class _HomPageState extends State<HomPage> {
                               fontSize: 30, fontWeight: FontWeight.w500),
                         ),
                       ),
-                      for (ToDo todo in _foundToDo.reversed)
-                        ToDoItem(
-                          toDo: todo,
-                          onToDoChanged: _handleToDoChange,
-                          onDeleteItem: _deleteToDoItem,
-                        ),
+                      // for (ToDo todo in _foundToDo.reversed)
+                      //   ToDoItem(
+                      //     toDo: todo,
+                      //     onToDoChanged: _handleToDoChange,
+                      //     onDeleteItem: _deleteToDoItem,
+                      //   ),
                     ],
                   ),
                 )
@@ -128,29 +136,27 @@ class _HomPageState extends State<HomPage> {
 
   void _deleteToDoItem(String id) {
     setState(() {
-      todoList.removeWhere((element) => element.id == id);
+      todoList.removeWhere((element) => element == id);
     });
   }
 
   void _addToDoItem(String todo) {
     setState(() {
-      todoList.add(ToDo(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          todoText: todo));
+      todoList.add(todo);
     });
     _todoController.clear();
   }
 
   void _runFilter(String enterKeyword) {
-    List<ToDo> results = [];
+    List<Map<String, dynamic>> results = [];
     if (enterKeyword.isEmpty) {
       results = todoList;
     } else {
-      results = todoList
-          .where((element) => element.todoText!
-              .toLowerCase()
-              .contains(enterKeyword.toLowerCase()))
-          .toList();
+      // results = todoList
+      //     .where((element) => element.
+      //         .toLowerCase()
+      //         .contains(enterKeyword.toLowerCase()))
+      //     .toList();
     }
     setState(() {
       _foundToDo = results;
@@ -159,12 +165,11 @@ class _HomPageState extends State<HomPage> {
 
   Widget searchBox() {
     return Container(
-
       padding: EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
           color: Colors.white, borderRadius: BorderRadius.circular(20)),
       child: TextField(
-        onChanged: (value)=> _runFilter(value),
+        onChanged: (value) => _runFilter(value),
         decoration: InputDecoration(
             contentPadding: EdgeInsets.all(0),
             prefixIcon: Icon(
