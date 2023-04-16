@@ -15,8 +15,8 @@ class HomPage extends StatefulWidget {
 class _HomPageState extends State<HomPage> {
   final todoList = ToDo.todoList();
   final _todoController = TextEditingController();
-  List<Map<String, dynamic>> _foundToDo = [];
-
+  List<ToDo> _foundToDo = [];
+  
   void _refreshTodo() async {
     final data = await SQLHelper.getItems();
     setState(() {
@@ -56,12 +56,12 @@ class _HomPageState extends State<HomPage> {
                               fontSize: 30, fontWeight: FontWeight.w500),
                         ),
                       ),
-                      // for (ToDo todo in _foundToDo.reversed)
-                      //   ToDoItem(
-                      //     toDo: todo,
-                      //     onToDoChanged: _handleToDoChange,
-                      //     onDeleteItem: _deleteToDoItem,
-                      //   ),
+                      for (ToDo todo in _foundToDo.reversed)
+                        ToDoItem(
+                          toDo: todo,
+                          onToDoChanged: _handleToDoChange,
+                          onDeleteItem: _deleteToDoItem,
+                        ),
                     ],
                   ),
                 )
@@ -136,27 +136,29 @@ class _HomPageState extends State<HomPage> {
 
   void _deleteToDoItem(String id) {
     setState(() {
-      todoList.removeWhere((element) => element == id);
+      todoList.removeWhere((element) => element.id == id);
     });
   }
 
   void _addToDoItem(String todo) {
     setState(() {
-      todoList.add(todo);
+      todoList.add(ToDo(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          todoText: todo));
     });
     _todoController.clear();
   }
 
   void _runFilter(String enterKeyword) {
-    List<Map<String, dynamic>> results = [];
+    List<ToDo> results = [];
     if (enterKeyword.isEmpty) {
       results = todoList;
     } else {
-      // results = todoList
-      //     .where((element) => element.
-      //         .toLowerCase()
-      //         .contains(enterKeyword.toLowerCase()))
-      //     .toList();
+      results = todoList
+          .where((element) => element.todoText!
+              .toLowerCase()
+              .contains(enterKeyword.toLowerCase()))
+          .toList();
     }
     setState(() {
       _foundToDo = results;

@@ -7,7 +7,7 @@ class SQLHelper {
   static Future<void> createTables(sql.Database database) async {
     await database.execute("""
 CREATE TABLE items(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-mycolumn BOOLEAN NOT NULL CHECK (mycolumn IN (0, 1)),
+check BOOLEAN NOT NULL CHECK (mycolumn IN (0, 1)),
 description TEXT,
 createdAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )
@@ -21,9 +21,9 @@ createdAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     });
   }
 
-  static Future<int> createItem(String title, String? description) async {
+  static Future<int> createItem(check, String? description) async {
     final db = await SQLHelper.db();
-    final data = {'title': title, 'description': description};
+    final data = {'check': check, 'description': description};
     final id = await db.insert('items', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
     return id;
@@ -40,10 +40,10 @@ createdAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
   }
 
   static Future<int> updateItem(
-      int id, String? title, String? description) async {
+      int id, check, String? description) async {
     final db = await SQLHelper.db();
     final data = {
-      'title': title,
+      'check': check,
       'description': description,
       'createdAt': DateTime.now().toString()
     };
