@@ -6,7 +6,7 @@ class ToDo {
   bool isDone;
   ToDo({required this.id, required this.todoText, this.isDone = false});
 
-  static List<Map<String,dynamic>> todoList() {
+  static List<ToDo> todoList() {
     return [
       
     ];

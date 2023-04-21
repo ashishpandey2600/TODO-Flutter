@@ -19,9 +19,7 @@ class _HomPageState extends State<HomPage> {
   
   void _refreshTodo() async {
     final data = await SQLHelper.getItems();
-    setState(() {
-      _foundToDo = data;
-    });
+  
   }
 
   @override
