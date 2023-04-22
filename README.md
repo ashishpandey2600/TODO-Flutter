@@ -39,8 +39,8 @@ Step-2: Go to project root and execute the following command in console to get t
         └─── pubspec.yaml
 
 ## Required Tools
-- Android Studio (Optional)
-- Visual Studio Code 
+- Android Studio 
+- Visual Studio Code (Optional)
 - Flutter
 - Dart
 
