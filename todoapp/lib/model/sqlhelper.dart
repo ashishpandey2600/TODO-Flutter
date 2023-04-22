@@ -7,23 +7,23 @@ class SQLHelper {
   static Future<void> createTables(sql.Database database) async {
     await database.execute("""
 CREATE TABLE items(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-check BOOLEAN NOT NULL CHECK (mycolumn IN (0, 1)),
 description TEXT,
+isdone BOOLEAN,
 createdAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )
 """);
   }
 
   static Future<sql.Database> db() async {
-    return sql.openDatabase('dbtech.db', version: 1,
+    return sql.openDatabase('dbtechh.db', version: 1,
         onCreate: (sql.Database database, int version) async {
       await createTables(database);
     });
   }
 
-  static Future<int> createItem(check, String? description) async {
+  static Future<int> createItem(isdone, String? description) async {
     final db = await SQLHelper.db();
-    final data = {'check': check, 'description': description};
+    final data = {'isdone': isdone, 'description': description};
     final id = await db.insert('items', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
     return id;
@@ -39,17 +39,21 @@ createdAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     return db.query('items', where: "id = >", whereArgs: [id], limit: 1);
   }
 
-  static Future<int> updateItem(
-      int id, check, String? description) async {
+  static Future<int> updateItem(int id, int isdone) async {
     final db = await SQLHelper.db();
-    final data = {
-      'check': check,
-      'description': description,
-      'createdAt': DateTime.now().toString()
-    };
-    final result =
-        await db.update('items', data, where: "if = ?", whereArgs: [id]);
-    return result;
+    int count = await db
+        .rawUpdate('UPDATE items SET isdone = ? WHERE id = ?', [isdone, id]);
+    print('updated1: $id');
+
+    // final data = {
+    //   'isdone': isdone,
+    //   'description': description,
+    //   'createdAt': DateTime.now().toString()
+    // };
+    print("update called");
+    // final result =
+    //     await db.update('items', data, where: "id = ?", whereArgs: [id]);
+    return count;
   }
 
   static Future<void> deleteItem(int id) async {
